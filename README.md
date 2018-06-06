@@ -34,11 +34,12 @@ For this test, the physical process is described with a 2D Gaussian function `ga
 2. Noisy observed data
 3. Initial guess
 4. LSfit solution
+
 ![alt text](images_readme/image_exemple_LSfit2D_small.png)
 
 Parameter | Background | Amplitude | Sigma_X | Sigma_Y | X0 | Y0 
  --- | --- | --- | --- |--- |--- |--- 
 True | 0 | 1 | 10 | 10 | 25 | 25 
-Guess | 0 | 0.8 | 7 | 10 | 35 | 25 
+Guess | 0.3 | 0.8 | 7 | 12 | 40 | 20 
 LSfit | -0.003 | 1.02 | 9.82 | 10.2 | 25.2 | 24.9 
 
