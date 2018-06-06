@@ -1,5 +1,5 @@
 # astrofit
-Python library containing usual 2D functions and fitting algorithm
+Python library containing usual 2D functions and fitting algorithm. Feel free to run the different tests provided in the **tests** folder, it will help you to handle the different functions and classes.
 
 ### Structure
 * **astrofit/** _(library)_
