@@ -6,7 +6,7 @@ Version : 1.0
 Python library containing usual 2D functions and fitting algorithm. Feel free to run the different tests provided in the `tests` folder, it will help you to handle the different functions and classes. Be aware that you might find better libraries on GitHub!!! You can send your questions or your comments on https://groups.google.com/d/forum/lsfit
 
 ### Structure
-* **astrofit/** _(library)_
+* **astrofit/** _(the library itself)_
   * **tests/** _(tests and examples)_
     * ... _(some tests)_
   * **\_\_init\_\_.py** _(init file)_
@@ -15,8 +15,9 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
   * **usual_functions.py** _(1D and 2D functions)_
   * **zernike.py** _(Zernike polynomials)_
 * **images_readme/** _(images for examples presented in README)_
-* **setup.py** _(setup file)_
+* **LICENSE** _(license file)_
 * **README.md** _(this file)_
+* **setup.py** _(setup file)_
 
 ### Content
 * **gauss** and **moffat** : Gaussian and Moffat functions from **_R_** to **_R_**
