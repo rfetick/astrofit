@@ -21,7 +21,7 @@ from astrofit import gauss, LSfit, LSparam, gauss2D, LSfit2D
 ###         Gaussian
 ###############################################################################
 
-print "-------------- LSfit --------------"
+print("-------------- LSfit --------------")
 
 Npoints = 50
 
@@ -43,10 +43,10 @@ param = LSfit(gauss,Ynoisy,X,param0,LM=True)
 Yfit = gauss(X,param)
 
 # SHOW RESULTS
-print "Param      : [bck,amp,sig,mid]"
-print "Param true : "+str(paramTrue)
-print "Param start: "+str(param0)
-print "Param fit  : "+str(floor(param*100)/100.0)
+print("Param      : [bck,amp,sig,mid]")
+print("Param true : "+str(paramTrue))
+print("Param start: "+str(param0))
+print("Param fit  : "+str(floor(param*100)/100.0))
 
 figure(0)
 clf()
@@ -67,7 +67,7 @@ show()
 # I introduce on purpose bad constraints on the parameters to show you the effects
 # However this may lead to errors of convergence
 
-print "-------------- LSfit constrained --------------"
+print("-------------- LSfit constrained --------------")
 
 # MINIMIZATION
 param0 = LSparam(paramInit)
@@ -77,11 +77,11 @@ param = LSfit(gauss,Ynoisy,X,param0,LM=True,debug=50)
 YfitCS = gauss(X,param)
 
 # SHOW RESULTS
-print "Param      : [bck,amp,sig,mid]"
-print "Param true : "+str(paramTrue)
-print "Param start: "+str(param0.value)
-print "Param fixed: "+str(param0.fixed)
-print "Param fit  : "+str(floor(param*100)/100.0)
+print("Param      : [bck,amp,sig,mid]")
+print("Param true : "+str(paramTrue))
+print("Param start: "+str(param0.value))
+print("Param fixed: "+str(param0.fixed))
+print("Param fit  : "+str(floor(param*100)/100.0))
 
 figure(1)
 clf()
@@ -98,7 +98,7 @@ show()
 ###         Gaussian 2D
 ###############################################################################
 
-print "-------------- Gaussian 2D --------------"
+print("-------------- Gaussian 2D --------------")
 
 [X,Y] = mgrid[0:Npoints,0:Npoints]
 A = zeros(7)
@@ -111,10 +111,12 @@ Gtrue = gauss2D(X,Y,A)
 
 Gnoisy = Gtrue + 1.*(rand(Npoints,Npoints)-.5)
 
-Ainit = A.copy()
-Ainit[1] = 0.8
-Ainit[2] = 7.0
-Ainit[4] += 10.
+#Ainit = A.copy()
+#Ainit[1] = 0.8
+#Ainit[2] = 7.0
+#Ainit[4] += 10.
+
+Ainit = [.3,.8,7,12.,40,20,0]
 
 Ginit = gauss2D(X,Y,Ainit)
 
