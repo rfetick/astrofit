@@ -75,7 +75,7 @@ def imcenter(im,size=-1,maxi=True,GC=False,center=None):
     if maxi==True:
         index = np.where(im==im.max())
         if len(index[0])>1:
-            print "Imcenter warning: more than one maximum found"
+            print("Imcenter warning: more than one maximum found")
         cX = index[0][0]
         cY = index[1][0]
           
