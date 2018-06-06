@@ -27,9 +27,18 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
 `scipy`,`numpy` and `matplotlib` are required
 
 ### Examples
-Example of fitting with LSfit. In this case, the physical process is described with a 2D Gaussian function `gauss2D`. Noisy data is observed, and we want to retrieve the Gaussian parameters (amplitude, width, center...) of the physical process. Image below shows from left to right:
+Example of fitting with LSfit. You can run this test using the file `astrofit/tests/test_LSfit.py`
+
+For this test, the physical process is described with a 2D Gaussian function `gauss2D`. Noisy data is observed, and we want to retrieve the Gaussian parameters (amplitude, width, center...) of the physical process. Image below shows from left to right:
 1. Physical observable to retrieve
 2. Noisy observed data
 3. Initial guess
 4. LSfit solution
 ![alt text](images_readme/image_exemple_LSfit2D_small.png)
+
+Parameter | Background | Amplitude | Sigma_X | Sigma_Y | X0 | Y0 
+ --- | --- | --- | --- |--- |--- |--- 
+True | 0 | 1 | 10 | 10 | 25 | 25 
+Guess | 0 | 0.8 | 7 | 10 | 35 | 25 
+LSfit | -0.003 | 1.02 | 9.82 | 10.2 | 25.2 | 24.9 
+
