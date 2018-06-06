@@ -20,8 +20,12 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
 ### Content
 * **gauss** and **moffat** : Gaussian and Moffat functions from **_R_** to **_R_**
 * **gauss2D** and **moffat2D** : Gaussian and Moffat functions from [**_RxR_**] to **_R_**
-* **LSfit** and **LSfit2D** : Least-square fitting between your noisy data and a parametric model (e.g. Gaussian or Moffat functions)
+* **LSfit** and **LSfit2D** : Least-square fitting between your noisy data and a parametric model (e.g. Gaussian or Moffat functions). Algorithm includes Levenberg-Marquardt method.
 * **Zernike** : Class representing one or several Zernike polynomials
 
 ### Requires
 `scipy`,`numpy` and `matplotlib` are required
+
+### Examples
+
+![alt text](image_exemple_LSfit2D_small.png)
