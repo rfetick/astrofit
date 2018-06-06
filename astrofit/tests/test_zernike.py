@@ -41,15 +41,15 @@ defoc.look()
 ## Define multiple Zernike, with coefficients
 
 phase = Zernike(Npix,J=[1,2,3])
-print 'Initial Zernike coeffs are'+str(phase.coeffs)
+print('Initial Zernike coeffs are'+str(phase.coeffs))
 phase.coeffs = [100,-80,80]
-print 'New Zernike coeffs are'+str(phase.coeffs)
+print('New Zernike coeffs are'+str(phase.coeffs))
 
 figure(3)
 clf()
 phase.look()
 
-print phase # print some information about your Zernike
+print(phase) # print some information about your Zernike
 
 phase2 = phase.getMode(2) # get the mode number 2, multiplied by its coeff
 phase2unit = phase.getUnitMode(2) # get the mode number 2, with unit coeff
@@ -60,8 +60,8 @@ phaseMap = phase.getSum() # get table of values associated to the Zernike
 
 zernikeFit = Zernike(Npix,J=[0,1,2,3,4,5])
 zernikeFit.fit(phaseMap)
-print 'Fitted coeffs: '+str(floor(zernikeFit.coeffs))
-print '(to be compared with phase.coeffs)'
+print('Fitted coeffs: '+str(floor(zernikeFit.coeffs)))
+print('(to be compared with phase.coeffs)')
 
 ## Transform a Zernike to a complex wavefront
 
@@ -74,19 +74,19 @@ WF = phase.toWF() # complex wavefront exp(i*phase)
 ## Fit a phase onto some Zernike functions
 
 coeff = Zernike.fitMode(phaseMap,J=[0,1,2,3,4,5])
-print 'Fitted coeffs: '+str(floor(coeff))
-print '(to be compared with phase.coeffs)'
+print('Fitted coeffs: '+str(floor(coeff)))
+print('(to be compared with phase.coeffs)')
 
 ## Convert J to [M,N] and vice-versa
 
 J=4
 MN = Zernike.JtoMN(J)
-print 'J='+str(J)+' is equivalent to [M,N]='+str(MN)
-print '[M,N]='+str(MN)+' is equivalent to J='+str(Zernike.MNtoJ(MN[0],MN[1]))
+print('J='+str(J)+' is equivalent to [M,N]='+str(MN))
+print('[M,N]='+str(MN)+' is equivalent to J='+str(Zernike.MNtoJ(MN[0],MN[1])))
 
 ## Plot pyramid
 
 Zernike.pyramid(Npix,5)
 
 J=4
-print 'J='+str(J)+' is '+str(Zernike.JtoSTR(J))
+print('J='+str(J)+' is '+str(Zernike.JtoSTR(J)))
