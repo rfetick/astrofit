@@ -131,10 +131,10 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
     
     # Print some information
     if not quiet:
-        print param.value
+        print(param.value)
         f = funct(Xarr,param.value)
         Xhi2 = sum(weights*(f-data)**2)
-        print "[Iter=0] Xhi2 = "+str(Xhi2)
+        print("[Iter=0] Xhi2 = "+str(Xhi2))
     
     
     # LOOP
@@ -180,11 +180,11 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
         
         ## DEBUG MODE: Print Xhi square and some info
         if debug and (iteration % debug)==0:
-            print "[Iter="+str(iteration)+"] Xhi2 = "+str(Xhi2)
+            print("[Iter="+str(iteration)+"] Xhi2 = "+str(Xhi2))
             if LM:
-                print "[Iter="+str(iteration)+"] mu = "+str(mu)
-            print "[Iter="+str(iteration)+"] Conditioning = "+_num2str(cond(JTJ))
-            print "[Iter="+str(iteration)+"] mu_cond = "+str(mu_cond)
+                print("[Iter="+str(iteration)+"] mu = "+str(mu))
+            print("[Iter="+str(iteration)+"] Conditioning = "+_num2str(cond(JTJ)))
+            print("[Iter="+str(iteration)+"] mu_cond = "+str(mu_cond))
                 
         ## Levenberg-Marquardt update for mu
         if LM:
@@ -211,10 +211,10 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
     ## END of LOOP and SHOW RESULTS
     
     if not quiet:
-        print "[Iter="+str(iteration)+"] Xhi2 = "+str(Xhi2)
-        print " "
-        print "Stopping condition: "+stop_trace
-        print " "
+        print("[Iter="+str(iteration)+"] Xhi2 = "+str(Xhi2))
+        print(" ")
+        print("Stopping condition: "+stop_trace)
+        print(" ")
     
     return param.value
 
@@ -225,29 +225,29 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
 
 def _print_info_matrix(M):
     
-    print "Matrix values:"
+    print("Matrix values:")
     for j in arange(len(M)):
         line_str = "["
         for i in arange(len(M[0])):
             line_str = line_str + " " + _num2str(M[j][i])
-        print line_str + " ]"
+        print(line_str + " ]")
 
-    print "Conditioning: "+_num2str(cond(M))
+    print("Conditioning: "+_num2str(cond(M)))
     
     line_str = "["
     for i in arange(len(M)):
         line_str = line_str + " " + _num2str(eig(M)[0][i])
-    print "Eigenvalues: " + line_str + " ]"
+    print("Eigenvalues: " + line_str + " ]")
 
 def _print_info_on_error(M,iteration,mu,values):
-    print "LSFit encountered an error at iter = "+str(iteration)
-    print "mu = "+str(mu)
+    print("LSFit encountered an error at iter = "+str(iteration))
+    print("mu = "+str(mu))
 #    print "##### JTJ matrix #####"
 #    _print_info_matrix(M)
 #    print "##### ########## #####"
-    print "##### Parameter #####"
-    print str(values)
-    print "##### ########## #####"
+    print("##### Parameter #####")
+    print(str(values))
+    print("##### ########## #####")
 
 
 def _num2str(x):
@@ -340,14 +340,14 @@ class LSparam(object):
         """
         Display information
         """
-        print "########## LSparam ##########"
-        print "Values         : " + str(self.value)
-        print "Fixed          : " + str(self.fixed)       
-        print "Bounds up      : " + str(self.bound_up)
-        print "Is bounded up  : " + str(self.is_bound_up)       
-        print "Bounds down    : " + str(self.bound_down)
-        print "Is bounded down: " + str(self.is_bound_down)
-        print "#############################"
+        print("########## LSparam ##########")
+        print("Values         : " + str(self.value))
+        print("Fixed          : " + str(self.fixed) )      
+        print("Bounds up      : " + str(self.bound_up))
+        print("Is bounded up  : " + str(self.is_bound_up) )      
+        print("Bounds down    : " + str(self.bound_down))
+        print("Is bounded down: " + str(self.is_bound_down))
+        print("#############################")
         
     def one(self,i):
         """
