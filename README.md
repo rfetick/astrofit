@@ -27,5 +27,9 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
 `scipy`,`numpy` and `matplotlib` are required
 
 ### Examples
-
-![alt text](image_exemple_LSfit2D_small.png)
+Example of fitting with LSfit. In this case, the physical process is described with a 2D Gaussian function `gauss2D`. Noisy data is observed, and we want to retrieve the Gaussian parameters (amplitude, width, center...) of the physical process. Image below shows from left to right:
+1. Physical observable to retrieve
+2. Noisy observed data
+3. Initial guess
+4. LSfit solution
+![alt text](images_readme/image_exemple_LSfit2D_small.png)
