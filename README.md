@@ -14,6 +14,7 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
   * **LSfit.py** _(fitting)_
   * **usual_functions.py** _(1D and 2D functions)_
   * **zernike.py** _(Zernike polynomials)_
+* **images_readme/** _(images for examples presented in README)_
 * **setup.py** _(setup file)_
 * **README.md** _(this file)_
 
