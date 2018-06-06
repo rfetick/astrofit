@@ -14,8 +14,5 @@ setup(name='astrofit',
       author='Romain JL Fetick',
       description='Functions and tools for optics and fitting.',
       packages=find_packages(exclude=['tests']),
-      install_requires=[
-          'numpy','mathplotlib','scipy'
-      ],
       zip_safe=False,
       )
