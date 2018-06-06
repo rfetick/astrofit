@@ -45,6 +45,6 @@ LSfit | -0.003 | 1.02 | 9.82 | 10.2 | 25.2 | 24.9
 
 ### Example Zernike
 
-Plot of the Zernike pyramid of polynoms up to radial order N=4. Mind the axis convention.
+Hereunder, the Zernike pyramid for polynoms up to radial order N=4. Mind the axis convention.
 
 ![alt text](images_readme/image_exemple_zernike.png)
