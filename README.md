@@ -26,7 +26,7 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
 ### Requires
 `scipy`,`numpy` and `matplotlib` are required
 
-### Examples
+### Example LSfit
 Example of fitting with LSfit. You can run this test using the file `astrofit/tests/test_LSfit.py`
 
 For this test, the physical process is described with a 2D Gaussian function `gauss2D`. Noisy data is observed, and we want to retrieve the Gaussian parameters (amplitude, width, center...) of the physical process. Image below shows from left to right:
@@ -43,3 +43,8 @@ True | 0 | 1 | 10 | 10 | 25 | 25
 Guess | 0.3 | 0.8 | 7 | 12 | 40 | 20 
 LSfit | -0.003 | 1.02 | 9.82 | 10.2 | 25.2 | 24.9 
 
+### Example Zernike
+
+Plot of the Zernike pyramid of polynoms up to radial order N=4. Mind the axis convention.
+
+![alt text](images_readme/image_exemple_zernike.png)
