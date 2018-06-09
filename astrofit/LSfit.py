@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 """
+=================
+LSfit
+=================
+Least-square fitting library
+See LSfit, LSfit2D and LSparam documentation
+
+Version 1.1
+
+REVISIONS:
 Created on Tue Jan 02 17:57:41 2018
 Updated on Sat Jan 13 13:01:00 2018
     Removed these ugly eval(.)
@@ -10,15 +19,15 @@ Updated on Sun Jan 14 21:26:00 2018
     Removed fixed params from inversion of JTJ
 Updated on Mon Jun 04 19:30:00 2018
     Added extension LSfit2D
+Updated on Sat Jun 09 11:30:00 2018
+    Added **kwargs to be able to pass keywords to the user function
+    Changed version from V.1.0 to V.1.1
 
-TO-DO
-- Check LSfit2D(.)
-- Check Levenberg-Marquardt regularization
+FUTURE IMPROVEMENTS:
 - Check the WEIGHTED least-square convergence
-- Pass a dict to the function using funct(X,Y,param,**{})
-  -> to be tested and documented
 - Enable parameter tied to another one
     
+
 Licence GNU-GPL v3.0
 
 @author: rfetick
