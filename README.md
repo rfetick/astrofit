@@ -3,7 +3,7 @@ Creation: June 6th, 2018
 
 Version : 1.0
 
-Python library containing usual 2D functions and fitting algorithm. Feel free to run the different tests provided in the `tests` folder, it will help you to handle the different functions and classes. Be aware that you might find better libraries on GitHub!!!
+Python library containing usual 2D functions and fitting algorithm. Feel free to run the different tests provided in the **tests/** folder, it will help you to handle the different functions and classes. Be aware that you might find better libraries on GitHub!!!
 
 You can send your questions or your comments on https://groups.google.com/d/forum/lsfit. Please send me your remarks and comments, I would like to improve my code with your feedbacks. This is my first module, if installation is not working well don't hesitate to tell me. Eventually you might have to go to the **astrofit/** root directory to run `import astrofit`, and then it should work ;)
 
