@@ -10,30 +10,25 @@ Updated on Tue Feb 20 20:00:00 2018
 from numpy import exp, cos, sin, array, pi
 from scipy.special import jv
 
+from scipy.signal import convolve2d
+
 ###############################################################################
 ###############################################################################
 
-def airy2D(Npix,D=0,PIX=0,LAMBDA=0,FOC=0,OCC=0):
+def airy2D(Npix,samp,OCC=0):
     """
     ### USAGE ###
     Create a 2D diffraction pattern
     ### INPUTS ###
-    [X,Y]  meshgrid where to evaluate the function
-    D      pupil diameter, in meter
-    PIX    pixel size, in meter
-    LAMBDA wavelength, in meter
-    FOC    equivalent focal length, in meter
-    OCC    eventual occultation, in meter
+    Npix - Size of array
+    samp - Sampling = (LAMBDA*FOC)/(PIX*D)
+    ### KEYWORDS ###
+    OCC    eventual occultation ratio = D_secondary / D_primary
     """
-    
-    if D<=0 or PIX<=0 or LAMBDA<=0 or FOC<=0:
-        raise ValueError("All keywords D, PIX, LAMBDA and FOC should be defined, and strictly positive")
-    
-    omega = pi*PIX*D/LAMBDA/FOC
-    eps = OCC/D
+    omega = pi/samp
     r = circarr(Npix,Npix)
     r[Npix/2,Npix/2] = 1e-5
-    res = 4.0/((1-eps**2)**2)*((jv(1,omega*r)-eps*jv(1,eps*omega*r))/(omega*r))**2
+    res = 4.0/((1-OCC**2)**2)*((jv(1,omega*r)-OCC*jv(1,OCC*omega*r))/(omega*r))**2
     res[Npix/2,Npix/2] = 1.0
     
     return res/res.sum()
@@ -119,7 +114,7 @@ def moffat(X,A):
 ###############################################################################
 ###############################################################################
 
-def moffat2D(X,Y,A):
+def moffat2D(X,Y,A,circular=False,energy=False):
     """
     ### USAGE ###
     Create a 2D Moffat function
@@ -134,6 +129,10 @@ def moffat2D(X,Y,A):
     A[5]   Peak centroid (y)
     A[6]   Tilt angle (clockwise)
     A[7]   Moffat power law
+    ### KEYWORDS ###
+    circular - Ignore A[3] and use A[2] instead
+    energy   - A[1] is not the amplitude anymore, but the energy of Moffat
+                before adding A[0]. Energy is defined only if A[7]>1
     ### OUTPUT ###
     The 2D-Moffat evaluated on the meshgrid
     """
@@ -143,6 +142,9 @@ def moffat2D(X,Y,A):
     alpha_X = A[2]
     alpha_Y = A[3]
     
+    if circular:
+        alpha_Y = alpha_X
+    
     # Rotational angles
     xNum = (cos(A[6])/alpha_X)**2 + (sin(A[6])/alpha_Y)**2
     yNum = (cos(A[6])/alpha_Y)**2 + (sin(A[6])/alpha_X)**2
@@ -150,6 +152,22 @@ def moffat2D(X,Y,A):
 
     # Compute Moffat
     u  = xNum*(X-A[4])**2 + xyNum*(X-A[4])*(Y-A[5]) + yNum*(Y-A[5])**2
-    moff = A[1]/(u + 1.)**A[7] + A[0]
+    moff = A[1]/(u + 1.)**A[7]
     
-    return moff
+    if energy:
+        if A[7]<=1:
+            raise ValueError("A[7] > 1 is required for energy normalization")
+        moff *= (A[7]-1.0)/(pi*alpha_X*alpha_Y)
+    
+    return moff + A[0]
+
+###############################################################################
+###############################################################################
+
+def moffatAiry(X,Y,A,**kwargs):
+    """
+    Convolve a Moffat with Airy
+    A[0] to A[7] are the Moffat parameters
+    A[8] is the Airy sampling
+    """
+    return convolve2d(moffat2D(X,Y,A[0:8],**kwargs),airy2D(X.shape[0],A[8]))

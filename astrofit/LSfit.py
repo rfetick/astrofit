@@ -15,6 +15,9 @@ TO-DO
 - Check LSfit2D(.)
 - Check Levenberg-Marquardt regularization
 - Check the WEIGHTED least-square convergence
+- Pass a dict to the function using funct(X,Y,param,**{})
+  -> to be tested and documented
+- Enable parameter tied to another one
     
 Licence GNU-GPL v3.0
 
@@ -29,7 +32,7 @@ from scipy.linalg import inv, LinAlgError
 #                         LSfit2D main function                               #
 ###############################################################################
 
-def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, LM=False, debug=False):
+def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, LM=False, debug=False, **kwargs):
     """
     #####  USAGE  #####
      Similar as LSfit
@@ -47,23 +50,23 @@ def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, LM=False, debug=Fals
     if size(weights) > 1:
         weights = weights.flatten()
         
-    param = LSfit(LFfitFUNCT,data.flatten(),X.flatten(),param0, weights=weights, quiet=quiet, LM=LM, debug=debug)
+    param = LSfit(_LSfitFUNCT,data.flatten(),X.flatten(),param0, weights=weights, quiet=quiet, LM=LM, debug=debug, **kwargs)
     
     return param
 
 
-def LFfitFUNCT(X,param):
+def _LSfitFUNCT(X,param, **kwargs):
     """
     Function to be called in internal
     """
-    return (LSfit2DfunctUSER(LSfit2DxUSER,LSfit2DyUSER,param)).flatten()
+    return (LSfit2DfunctUSER(LSfit2DxUSER,LSfit2DyUSER,param, **kwargs)).flatten()
 
 ###############################################################################
 #                         LSfit main function                                 #
 ###############################################################################
     
 
-def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
+def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **kwargs):
     """ 
     #####  USAGE  #####
      Least-square minimization algorithm.
@@ -75,6 +78,8 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
      "data" is the noisy observation
      "f(X,param)" is your model, set by the vector of parameters "param" and evaluated on coordinates X
     
+    Algorithm is Levenberg-Marquardt, with adaptive damping factor
+    
     #####  INPUTS  #####
      funct   - [Function] The function to call
      data    - [Vector] Noisy data
@@ -82,6 +87,7 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
      param0  - [Vector,LSparam] First estimation of parameters
                  param0 can be simply a vector
                  if param0 is a LSparam, you can define bounds, fixed values...
+                 see LSparam documentation
     
     ##### OPTIONAL INPUTS #####
      weights - [Vector] Weights (1/noise^2) on each coordinate X
@@ -89,12 +95,13 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
                   weights = 1/sigma^2 for a gaussian noise
                   weights = 1/data for a Poisson-like noise
      LM      - [Boolean] Levenberg-Marquardt algorithm
-                  Default : LM = False
+                  Default : LM = True
      quiet   - [Boolean] Don't print status of algorithm
-                  Default : quiet = False
+                  Default : quiet = True
      debug   - [Integer] Print status for each iteration
                   Default : debug = 0
                   For example debug = 5 prints 1 line over 5
+    **kwargs - [Dictionary] Use a dictionary to pass some keywords to your function
     
     #####  OUTPUT  #####
      param   - [Vector] Best parameters for least-square fitting
@@ -131,8 +138,8 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
     
     # Print some information
     if not quiet:
-        print(param.value)
-        f = funct(Xarr,param.value)
+        #print(param.value)
+        f = funct(Xarr,param.value,**kwargs)
         Xhi2 = sum(weights*(f-data)**2)
         print("[Iter=0] Xhi2 = "+str(Xhi2))
     
@@ -140,7 +147,7 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
     # LOOP
     
     iteration = 0
-    f = funct(Xarr,param.value)
+    f = funct(Xarr,param.value,**kwargs)
     
     while (iteration < max_iter) and not stop_loop:
         
@@ -148,7 +155,7 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
         
         ## Iterate over each parameter to compute derivative
         for ip in param.validValue:          
-            J[:,ip] = weights*(funct(Xarr,param.value+h*param.one(ip))-f)/h
+            J[:,ip] = weights*(funct(Xarr,param.step(ip,h),**kwargs)-f)/h
         
         ## Compute dvalue = -{(transpose(J)*J)^(-1)}*transpose(J)*(weights*(func-data))
         ## Reduce the matrix J only on the moving parameters
@@ -174,9 +181,9 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=False, LM=False, debug=False):
         ## Xhi square old
         Xhi2 = sum(weights*(f-data)**2)
         # Step forward with dvalue
-        param.step()
+        param.forward()
         # New value of f(.)
-        f = funct(Xarr,param.value)
+        f = funct(Xarr,param.value,**kwargs)
         
         ## DEBUG MODE: Print Xhi square and some info
         if debug and (iteration % debug)==0:
@@ -290,6 +297,7 @@ class LSparam(object):
     """
     Class LS param, to be used is LSfit
     Define more precisely your parameters
+    Only "value" (see hereunder) is mandatory
     
     ATTRIBUTES
     value         - [List] Initial guess for your parameters
@@ -298,6 +306,8 @@ class LSparam(object):
     bound_down    - [List] Set the value of eventual down-bounds
     is_bound_up   - [List] Set to 'True' to activate bounds
     is_bound_down - [List] Set to 'True' to activate bounds
+    tied          - [List] Not debugged yet!!!
+                            Example: myLSparam.tied[3] = "2*P[4]+P[5]"
     
     """
     
@@ -317,6 +327,7 @@ class LSparam(object):
             self.bound_down = array([0 for i in arange(L)],dtype=float)
             self.is_bound_up = [False for i in arange(L)]
             self.is_bound_down = [False for i in arange(L)]
+            self.tied = [False for i in arange(L)]
             # User shouldn't access these attributes
             self.nb_param = L
             self.valueInit = self.value
@@ -359,7 +370,26 @@ class LSparam(object):
         a[i] = 1.0
         return a
     
-    def step(self):
+    def step(self,i,h):
+        """
+        Return the parameter stepped at the i-th position
+        (p+h*[0,,0...0,1,0...0])
+        
+        If some tied parameters, include them in the step
+        """
+        
+        P  = self.value + h*self.one(i)
+        
+        A = arange(self.nb_param)
+        TI = array([0 for pp in A])
+        
+        for n in A:
+            if self.tied[n] != False:
+                TI[n] = eval(self.tied[n])
+                
+        return P+TI
+    
+    def forward(self):
         """
         Steps forward the param.value with param.dvalue
         """
@@ -369,6 +399,11 @@ class LSparam(object):
         conditionDOWN = ((self.value + self.dvalue) > self.bound_down) | (1- array(self.is_bound_down))
         conditionFIXED = 1 - array(self.fixed)
         self.value = self.value + self.dvalue * (conditionUP & conditionDOWN & conditionFIXED)
+        # Move forward the tied parameters
+        P = self.value
+        for n in arange(self.nb_param):
+            if self.tied[n] != False:
+                self.value[n] = eval(self.tied[n])
         
     def initParam(self):
         """
@@ -381,7 +416,7 @@ class LSparam(object):
         self.dvalue = array([0 for i in arange(self.nb_param)],dtype=float)
         self.validValue = []
         for i in arange(self.nb_param):
-            if not self.fixed[i]:
+            if (not self.fixed[i]) and (not self.tied[i]):
                 self.validValue.append(i)
         self.nb_valid_param = len(self.validValue)
     
