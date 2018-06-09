@@ -21,12 +21,13 @@ Python library containing usual 2D functions and fitting algorithm. Feel free to
 
 ### Content
 * **gauss** and **moffat** : Gaussian and Moffat functions from **_R_** to **_R_**
-* **gauss2D** and **moffat2D** : Gaussian and Moffat functions from [**_RxR_**] to **_R_**
-* **LSfit** and **LSfit2D** : Least-square fitting between your noisy data and a parametric model (e.g. Gaussian or Moffat functions). Algorithm includes Levenberg-Marquardt method.
+* **airy2D** , **gauss2D** and **moffat2D** : Airy, Gaussian and Moffat functions from [**_RxR_**] to **_R_**
+* **LSfit** and **LSfit2D** : Least-square fitting between your noisy data and a parametric model (e.g. Gaussian or Moffat functions). Algorithm performs a Levenberg-Marquardt minimization method with variable damping parameter.
+* **LSparam** : A class to be used in LSfit. It allows to bound or lock some of your parameters during the fitting. 
 * **Zernike** : Class representing one or several Zernike polynomials
 
 ### Requires
-`scipy`,`numpy` and `matplotlib` are required
+`math`, `scipy`, `numpy` and `matplotlib` are required
 
 ### Example LSfit
 Example of fitting with LSfit. You can run this test using the file `astrofit/tests/test_LSfit.py`
