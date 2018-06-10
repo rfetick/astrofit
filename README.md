@@ -1,7 +1,7 @@
 # astrofit
 Creation: June 6th, 2018
 
-Version : 1.0
+Version : 1.1
 
 Python library containing usual 2D functions and fitting algorithm. Feel free to run the different tests provided in the **tests/** folder, it will help you to handle the different functions and classes. Be aware that you might find better libraries on GitHub!!!
 
