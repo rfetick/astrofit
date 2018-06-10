@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
  
 setup(name='astrofit',
       version='1.1',
-      url='unknown',
+      url='https://github.com/rfetick/astrofit',
       license='GNU-GPL v3.0',
       author='Romain JL Fetick',
       description='Functions and tools for optics and fitting.',
