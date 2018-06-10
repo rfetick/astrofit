@@ -129,7 +129,7 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
     
     # STOPPING CONDITIONS
     J_min = 1e-5*param.nb_param**2 # stopping criteria based on small Jacobian
-    dp_min = 1e-8 # stopping criteria based on small variation of parameters
+    dp_min = 1e-7 # stopping criteria based on small variation of parameters
     max_iter = 1e4 # stopping criteria based on max number of iteration
     stop_loop = False # boolean for stopping the loop
     stop_trace = "Maximum iteration reached (iter="+str(max_iter)+")"
