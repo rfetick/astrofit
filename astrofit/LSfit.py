@@ -6,22 +6,20 @@ LSfit
 Least-square fitting library
 See LSfit, LSfit2D and LSparam documentation
 
-Version 1.1
+Version 1.2
 
 REVISIONS:
 Created on Tue Jan 02 17:57:41 2018
 Updated on Sat Jan 13 13:01:00 2018
-    Removed these ugly eval(.)
-    Created class LSparam for bounding and fixing parameters
     Stabilized algo with matrix conditioning
-Updated on Sun Jan 14 21:26:00 2018
-    Improved boundaries conditions and check
-    Removed fixed params from inversion of JTJ
-Updated on Mon Jun 04 19:30:00 2018
-    Added extension LSfit2D
 Updated on Sat Jun 09 11:30:00 2018
     Added **kwargs to be able to pass keywords to the user function
+    Changed dp_min from 1e-8 to 1e-7, to reduce computation time
     Changed version from V.1.0 to V.1.1
+Updated on Sun Jun 10 23:00:00 2018
+    Simplified code (less keywords)
+    LSfit checks number of outputs and eventually returns "status" as second output
+    Changed version from V.1.1 to V.1.2
 
 FUTURE IMPROVEMENTS:
 - Check the WEIGHTED least-square convergence
@@ -37,11 +35,14 @@ from numpy import size, zeros, arange, array, dot, diag, eye, floor, log10, inf,
 from numpy.linalg import cond, eig
 from scipy.linalg import inv, LinAlgError
 
+import inspect
+import dis
+
 ###############################################################################
 #                         LSfit2D main function                               #
 ###############################################################################
 
-def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, LM=False, debug=False, **kwargs):
+def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, debug=False, **kwargs):
     """
     #####  USAGE  #####
      Similar as LSfit
@@ -58,8 +59,16 @@ def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, LM=False, debug=Fals
     
     if size(weights) > 1:
         weights = weights.flatten()
-        
-    param = LSfit(_LSfitFUNCT,data.flatten(),X.flatten(),param0, weights=weights, quiet=quiet, LM=LM, debug=debug, **kwargs)
+    
+    nout = _n_out(offset=3)
+    if nout > 2:
+        raise ValueError("Number of outpt argument for LSfit2D can be only 1 or 2")
+    
+    if nout==2:
+       param, status = LSfit(_LSfitFUNCT,data.flatten(),X.flatten(),param0, weights=weights, quiet=quiet, **kwargs)
+       return param, status
+    
+    param = LSfit(_LSfitFUNCT,data.flatten(),X.flatten(),param0, weights=weights, quiet=quiet, **kwargs)
     
     return param
 
@@ -75,7 +84,7 @@ def _LSfitFUNCT(X,param, **kwargs):
 ###############################################################################
     
 
-def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **kwargs):
+def LSfit(funct,data,X,param0, weights=-1, quiet=True, **kwargs):
     """ 
     #####  USAGE  #####
      Least-square minimization algorithm.
@@ -88,6 +97,16 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
      "f(X,param)" is your model, set by the vector of parameters "param" and evaluated on coordinates X
     
     Algorithm is Levenberg-Marquardt, with adaptive damping factor
+    
+    #####  SYNTAX  #####
+    Two syntaxes are possible
+    
+    param        = LSfit(funct,data,X,param0)
+    param,status = LSfit(funct,data,X,param0)
+    
+    "param"  is the returned solution
+    "status" contains extra information about convergence
+             status = {"xhi2","mu","param"}
     
     #####  INPUTS  #####
      funct   - [Function] The function to call
@@ -103,13 +122,8 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
                   Default : no weighting (weights=1)
                   weights = 1/sigma^2 for a gaussian noise
                   weights = 1/data for a Poisson-like noise
-     LM      - [Boolean] Levenberg-Marquardt algorithm
-                  Default : LM = True
      quiet   - [Boolean] Don't print status of algorithm
                   Default : quiet = True
-     debug   - [Integer] Print status for each iteration
-                  Default : debug = 0
-                  For example debug = 5 prints 1 line over 5
     **kwargs - [Dictionary] Use a dictionary to pass some keywords to your function
     
     #####  OUTPUT  #####
@@ -127,12 +141,17 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
     h = 1e-9 #step to compute Jacobian
     bad_cond = 1e10 #conditioning higher than this value is bad
     
+    status = {"xhi2":[],"mu":[],"param":[]}
+    nout = _n_out(offset=3)
+    if nout > 2:
+        raise ValueError("Number of outpt argument for LSfit can be only 1 or 2")
+    
     # STOPPING CONDITIONS
     J_min = 1e-5*param.nb_param**2 # stopping criteria based on small Jacobian
-    dp_min = 1e-7 # stopping criteria based on small variation of parameters
+    dp_min = 1e-7 #(1e-8) stopping criteria based on small variation of parameters
     max_iter = 1e4 # stopping criteria based on max number of iteration
     stop_loop = False # boolean for stopping the loop
-    stop_trace = "Maximum iteration reached (iter="+str(max_iter)+")"
+    stop_trace = "LSfit started but not finished correctly"
     
     # WEIGHTS
     if size(weights)==1 and weights<=0:
@@ -141,15 +160,13 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
         raise ValueError("WEIGHTS should be a scalar or same size as X")
     
     # LEVENBERG-MARQUARDT
-    mu = 0
-    if LM:
-        mu = 1
+    mu = 1
     
     # Print some information
+    f = funct(Xarr,param.value,**kwargs)    
+    Xhi2 = sum(weights*(f-data)**2)
+    status["xhi2"].append(Xhi2)
     if not quiet:
-        #print(param.value)
-        f = funct(Xarr,param.value,**kwargs)
-        Xhi2 = sum(weights*(f-data)**2)
         print("[Iter=0] Xhi2 = "+str(Xhi2))
     
     
@@ -189,26 +206,23 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
         
         ## Xhi square old
         Xhi2 = sum(weights*(f-data)**2)
+        
+        if nout==2:
+            status["xhi2"].append(Xhi2)
+            status["mu"].append(mu)
+            status["param"].append(param.value)
+            
         # Step forward with dvalue
         param.forward()
         # New value of f(.)
         f = funct(Xarr,param.value,**kwargs)
-        
-        ## DEBUG MODE: Print Xhi square and some info
-        if debug and (iteration % debug)==0:
-            print("[Iter="+str(iteration)+"] Xhi2 = "+str(Xhi2))
-            if LM:
-                print("[Iter="+str(iteration)+"] mu = "+str(mu))
-            print("[Iter="+str(iteration)+"] Conditioning = "+_num2str(cond(JTJ)))
-            print("[Iter="+str(iteration)+"] mu_cond = "+str(mu_cond))
                 
         ## Levenberg-Marquardt update for mu
-        if LM:
-            Xhi2_new = sum(weights*(f-data)**2)
-            if Xhi2_new > Xhi2:
-                mu = min(10*mu,1e10)
-            else:
-                mu = max(0.1*mu,1e-10)
+        Xhi2_new = sum(weights*(f-data)**2)
+        if Xhi2_new > Xhi2:
+            mu = min(10*mu,1e10)
+        else:
+            mu = max(0.1*mu,1e-10)
         
         ## Stop loop based on small variation of parameter
         if param.dvalueNorm() < dp_min*param.valueNorm():
@@ -226,11 +240,17 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, LM=True, debug=False, **k
     
     ## END of LOOP and SHOW RESULTS
     
+    if iteration >= max_iter:
+        stop_trace = "Maximum iteration reached (iter="+str(iteration)+")"
+    
     if not quiet:
         print("[Iter="+str(iteration)+"] Xhi2 = "+str(Xhi2))
         print(" ")
         print("Stopping condition: "+stop_trace)
         print(" ")
+    
+    if nout==2:
+        return param.value, status
     
     return param.value
 
@@ -258,9 +278,6 @@ def _print_info_matrix(M):
 def _print_info_on_error(M,iteration,mu,values):
     print("LSFit encountered an error at iter = "+str(iteration))
     print("mu = "+str(mu))
-#    print "##### JTJ matrix #####"
-#    _print_info_matrix(M)
-#    print "##### ########## #####"
     print("##### Parameter #####")
     print(str(values))
     print("##### ########## #####")
@@ -297,6 +314,27 @@ def _improve_cond(M,bad_cond,Id):
     return mu
     
 
+###############################################################################
+#                      Expected outputs                                       #
+###############################################################################
+
+def _n_out(offset=0):
+    """
+    Return how many values the caller is expecting
+    Function from Stackoverflow
+    https://stackoverflow.com/questions/16481156/find-out-into-how-many-values-a-return-value-will-be-unpacked
+    """
+    f = inspect.currentframe().f_back.f_back
+    i = f.f_lasti + offset
+    bytecode = f.f_code.co_code
+    instruction = ord(bytecode[i])
+    if instruction == dis.opmap['UNPACK_SEQUENCE']:
+        return ord(bytecode[i + 1])
+    elif instruction == dis.opmap['POP_TOP']:
+        return 0
+    else:
+        return 1
+
 
 ###############################################################################
 #                   Define a class to precise parameters                      #
@@ -315,8 +353,6 @@ class LSparam(object):
     bound_down    - [List] Set the value of eventual down-bounds
     is_bound_up   - [List] Set to 'True' to activate bounds
     is_bound_down - [List] Set to 'True' to activate bounds
-    tied          - [List] Not debugged yet!!!
-                            Example: myLSparam.tied[3] = "2*P[4]+P[5]"
     
     """
     
@@ -336,7 +372,6 @@ class LSparam(object):
             self.bound_down = array([0 for i in arange(L)],dtype=float)
             self.is_bound_up = [False for i in arange(L)]
             self.is_bound_down = [False for i in arange(L)]
-            self.tied = [False for i in arange(L)]
             # User shouldn't access these attributes
             self.nb_param = L
             self.valueInit = self.value
@@ -388,15 +423,8 @@ class LSparam(object):
         """
         
         P  = self.value + h*self.one(i)
-        
-        A = arange(self.nb_param)
-        TI = array([0 for pp in A])
-        
-        for n in A:
-            if self.tied[n] != False:
-                TI[n] = eval(self.tied[n])
                 
-        return P+TI
+        return P
     
     def forward(self):
         """
@@ -408,11 +436,6 @@ class LSparam(object):
         conditionDOWN = ((self.value + self.dvalue) > self.bound_down) | (1- array(self.is_bound_down))
         conditionFIXED = 1 - array(self.fixed)
         self.value = self.value + self.dvalue * (conditionUP & conditionDOWN & conditionFIXED)
-        # Move forward the tied parameters
-        P = self.value
-        for n in arange(self.nb_param):
-            if self.tied[n] != False:
-                self.value[n] = eval(self.tied[n])
         
     def initParam(self):
         """
@@ -425,7 +448,7 @@ class LSparam(object):
         self.dvalue = array([0 for i in arange(self.nb_param)],dtype=float)
         self.validValue = []
         for i in arange(self.nb_param):
-            if (not self.fixed[i]) and (not self.tied[i]):
+            if (not self.fixed[i]):
                 self.validValue.append(i)
         self.nb_valid_param = len(self.validValue)
     
@@ -461,12 +484,6 @@ class LSparam(object):
             if self.is_bound_up[i]:
                 if self.value[i] > self.bound_up[i]:
                     raise ValueError("Paramter number "+str(i)+" is initialized higher than its bound_up")
-            
-#        if inf in self.value:
-#            return False
-#        if NaN in self.value:
-#            return False
-#        return True
         
     def set_bound_down(self,val):
         """
