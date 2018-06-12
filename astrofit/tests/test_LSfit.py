@@ -39,7 +39,7 @@ Ynoisy = Ytrue + noiseAmp*(rand(Npoints)-.5)
 # MINIMIZATION
 param0 = array(paramInit)
 Ystart = gauss(X,param0)
-param = LSfit(gauss,Ynoisy,X,param0,LM=True)
+param = LSfit(gauss,Ynoisy,X,param0)
 Yfit = gauss(X,param)
 
 # SHOW RESULTS
@@ -73,7 +73,7 @@ print("-------------- LSfit constrained --------------")
 param0 = LSparam(paramInit)
 param0.fixed = [False,False,True,False]
 #param0.set_bound_down(2)
-param = LSfit(gauss,Ynoisy,X,param0,LM=True,debug=50)
+param = LSfit(gauss,Ynoisy,X,param0)
 YfitCS = gauss(X,param)
 
 # SHOW RESULTS
@@ -120,7 +120,7 @@ Ainit = [.3,.8,7,12.,40,20,0]
 
 Ginit = gauss2D(X,Y,Ainit)
 
-param = LSfit2D(gauss2D,Gnoisy,X,Y,Ainit,LM=True)
+param = LSfit2D(gauss2D,Gnoisy,X,Y,Ainit)
 Gfit = gauss2D(X,Y,param)
 
 
