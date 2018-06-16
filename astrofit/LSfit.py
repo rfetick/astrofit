@@ -42,11 +42,52 @@ import dis
 #                         LSfit2D main function                               #
 ###############################################################################
 
-def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, debug=False, **kwargs):
-    """
+def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=True, **kwargs):
+    """ 
     #####  USAGE  #####
-     Similar as LSfit
-     "funct", "data", "X", "Y" and eventually "weights" should be 2D arrays
+     Least-square minimization algorithm.
+     Parametric least-square fitting.
+     
+     Minimises Xhi2 = sum(weights*(f(X,Y,param) - data)^2)
+     where the sum(.) runs over the coordinates X and Y
+     minimization is performed over the unknown "param"
+     "data" is the noisy observation
+     "f(X,Y,param)" is your model, set by the vector of parameters "param" and evaluated on coordinates (X,Y)
+    
+    Algorithm is Levenberg-Marquardt, with adaptive damping factor
+    
+    #####  SYNTAX  #####
+    Two syntaxes are possible
+    
+    param        = LSfit(funct,data,X,Y,param0)
+    param,status = LSfit(funct,data,X,Y,param0)
+    
+    "param"  is the returned solution
+    "status" contains extra information about convergence
+             status = {"xhi2","mu","param"}
+    
+    #####  INPUTS  #####
+     funct   - [Function] The function to call
+     data    - [2D array] Noisy data
+     X       - [2D array] Coordinates where to evaluate the function
+     Y       - [2D array] Coordinates where to evaluate the function
+     param0  - [Vector,LSparam] First estimation of parameters
+                 param0 can be simply a vector
+                 if param0 is a LSparam, you can define bounds, fixed values...
+                 see LSparam documentation
+    
+    ##### OPTIONAL INPUTS #####
+     weights - [2D array] Weights (1/noise^2) on each coordinate (X,Y)
+                  Default : no weighting (weights=1)
+                  weights = 1/sigma^2 for a gaussian noise
+                  weights = 1/data for a Poisson-like noise
+     quiet   - [Boolean] Don't print status of algorithm
+                  Default : quiet = True
+    **kwargs - [Dictionary] Use a dictionary to pass some keywords to your function
+    
+    #####  OUTPUT  #####
+     param   - [Vector] Best parameters for least-square fitting
+     status  - [dictionary] Optional output, contains some information about convergence
     """
     global LSfit2DfunctUSER
     LSfit2DfunctUSER = funct
@@ -75,7 +116,7 @@ def LSfit2D(funct,data,X,Y,param0, weights=-1, quiet=False, debug=False, **kwarg
 
 def _LSfitFUNCT(X,param, **kwargs):
     """
-    Function to be called in internal
+    Function to be called in internal as interface with user function
     """
     return (LSfit2DfunctUSER(LSfit2DxUSER,LSfit2DyUSER,param, **kwargs)).flatten()
 
@@ -128,6 +169,7 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, **kwargs):
     
     #####  OUTPUT  #####
      param   - [Vector] Best parameters for least-square fitting
+     status  - [dictionary] Optional output, contains some information about convergence
     """
     # INITIALIZATION
     Xarr = array(X)
@@ -250,6 +292,7 @@ def LSfit(funct,data,X,param0, weights=-1, quiet=True, **kwargs):
         print(" ")
     
     if nout==2:
+        status["param"] = array(status["param"])
         return param.value, status
     
     return param.value
