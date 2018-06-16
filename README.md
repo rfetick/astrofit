@@ -1,16 +1,15 @@
 # astrofit
 Creation: June 6th, 2018
 
-Version : 1.1
+Version : 1.2
 
-Python library containing usual 2D functions and fitting algorithm. Feel free to run the different tests provided in the **tests/** folder, it will help you to handle the different functions and classes. Everything seems to work properly, however you might find better libraries on GitHub!!!
+Python library containing usual 2D functions and fitting algorithm. Feel free to run the different examples provided in the **examples/** folder, it will help you to handle the different functions and classes. Everything seems to work properly, however you might find better libraries on GitHub!!!
 
 You can send your questions or your comments on https://groups.google.com/d/forum/lsfit. Please send me your remarks and comments, I would like to improve my code with your feedbacks. This is my first module, if installation is not working well don't hesitate to tell me. Eventually you might have to go to the **astrofit/** root directory to run the command line `import astrofit`, and then it should work 😉
 
 ### Structure
 * **astrofit/** _(the library itself)_
-  * **tests/** _(tests and examples)_
-    * ... _(some tests)_
+  * **examples/** _(folder of examples)_
   * **\_\_init\_\_.py** _(init file)_
   * **circular_lib.py**  _(image centering and circular plots)_
   * **LSfit.py** _(fitting)_
@@ -32,7 +31,7 @@ You can send your questions or your comments on https://groups.google.com/d/foru
 `math`, `scipy`, `numpy` and `matplotlib` are required
 
 ### Example LSfit
-Example of fitting with LSfit. You can run this test using the file `astrofit/tests/test_LSfit.py`
+Example of fitting with LSfit. You can run this test using the file `astrofit/examples/LSfit_example_2D.py`
 
 For this test, the physical process is described with a 2D Gaussian function `gauss2D`. Noisy data is observed, and we want to retrieve the Gaussian parameters (amplitude, width, center...) of the physical process. Image below shows from left to right:
 1. Physical observable to retrieve
